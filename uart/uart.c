@@ -22,10 +22,7 @@ typedef union {
 } crcCalculateBytes;
 
 void envia_info(int uart0_filestream,char tipo){
-    
-    // union CONV num;
-    // int matricula = 3244;
-    // num.inteiro= matricula;
+
     char teste[4];
     teste[0] = 0x02;
     teste[1] = 0x03;
@@ -36,25 +33,15 @@ void envia_info(int uart0_filestream,char tipo){
     crcCalculateBytes crcunion;
     crcunion.crc = calcula_CRC(codigo,7);
 
-    // unsigned char aux[2];
-    // aux[0] = (crc & 255);
-    // aux[1] = ((crc >> 8) & 255);
-
     unsigned char msg[9];
     memcpy(msg,codigo,7);
     memcpy(&msg[7], crcunion.bytes, 2);
-    // printf("Buffers de memória criados!\n");
 
     if (uart0_filestream != -1){
-        // printf("Escrevendo caracteres na UART ...");
         int count = write(uart0_filestream, &msg[0],9);
         if (count < 0)
         {
             printf("UART TX error\n");
-        }
-        else
-        {
-            printf("escrito.\n");
         }
     }
 }

@@ -56,7 +56,7 @@ void lcd(float te, float ti, float tr)   {
   lcdLoc(LINE1);
   typeln("TE:");
   typeFloat(te);
-  typeln("TI:");
+  typeln(" TI:");
   typeFloat(ti);
   lcdLoc(LINE2);
   typeln("TR:");
