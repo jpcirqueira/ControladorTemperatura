@@ -10,7 +10,7 @@ void gpio_liga(int pino, int pwm){
         printf("erro ao iniciar wiringPi");
         exit(1);
     }
-
+    
     pinMode(pino,OUTPUT);
     softPwmCreate(pino,0,100);
     softPwmWrite(pino, pwm);

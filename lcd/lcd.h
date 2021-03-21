@@ -2,5 +2,6 @@
 #define __LCD__
 
 void lcd(float te, float ti, float tr);
+void ClrLcd(void);
 
 #endif

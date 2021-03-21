@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include "bme280.h"
 
+int aux =0;
+
 float bme()
 {
   int i;
@@ -16,8 +18,15 @@ float bme()
   i = bme280Init(1, 0x76);
   if (i != 0)
   {
-    printf("ocorreu um erro ao abrir o bme280");
-    return -1;
+    printf("ocorreu um erro ao abrir o bme280 ira tentar novamente.\n");
+    if(aux>2){
+      aux =0;
+      return 0;
+    }else{
+      aux+=1;
+      bme();
+    }
+    
   }
   // usleep(1000000); // wait for data to settle for first read
   bme280ReadValues(&T, &P, &H);

@@ -9,7 +9,7 @@
 #define COD_SERVIDOR 0x01
 
 #define SOLICITA 0x23
-
+unsigned char rx_buffer[9];
 union CONV
 {
     int inteiro;
@@ -17,22 +17,37 @@ union CONV
 };
 
 typedef union {
-    short crc;   
+    unsigned short crc;   
     uint8_t bytes[2]; 
 } crcCalculateBytes;
 
+int erro = 0;
+
+int confere_crc(){
+    crcCalculateBytes crcrecebido;
+    crcCalculateBytes crcauxiliar;
+    crcrecebido.bytes[0] = rx_buffer[7];
+    crcrecebido.bytes[1] = rx_buffer[8];
+    crcauxiliar.crc = calcula_CRC(rx_buffer,7);
+    if(crcrecebido.crc == crcauxiliar.crc){
+        return 1; // o crc enviado foi calculado certo
+    }else{
+        return -1; // o crc enviado foi calculado errado
+    }
+}
+
 void envia_info(int uart0_filestream,char tipo){
 
-    char teste[4];
-    teste[0] = 0x02;
-    teste[1] = 0x03;
-    teste[2] = 0x04;
-    teste[3] = 0x04;
+    char matricula[4];
+    matricula[0] = 0x02;
+    matricula[1] = 0x03;
+    matricula[2] = 0x04;
+    matricula[3] = 0x04;
     unsigned char codigo[9] = {COD_SERVIDOR,SOLICITA,tipo};
-    memcpy(&codigo[3],&teste,4);
+    memcpy(&codigo[3],&matricula,4);
     crcCalculateBytes crcunion;
     crcunion.crc = calcula_CRC(codigo,7);
-
+    
     unsigned char msg[9];
     memcpy(msg,codigo,7);
     memcpy(&msg[7], crcunion.bytes, 2);
@@ -69,19 +84,32 @@ float uart(char solicita) {
 
     if (uart0_filestream != -1)
     {
-        unsigned char rx_buffer[256];
-        int rx_length = read(uart0_filestream, (void*)rx_buffer, 255);
-        if (rx_length < 0)
+
+        int rx_length = read(uart0_filestream, (void*)rx_buffer, 9);
+        if (rx_length <= 0)
         {
             printf("Erro na leitura.\n"); 
-        }
-        else if (rx_length == 0)
-        {
-            printf("Nenhum dado disponível.\n");
+            if(erro>2){ // se ja ocorreu 2 erros
+                erro =0;
+            }else{ // se ocorreu menos de 2 erros solicita novamente
+                erro+=1;
+                uart(solicita); 
+            }
         }
         else
         {
-          memcpy(&data, &rx_buffer[3], 4);
+           
+            int errocrc = confere_crc();
+            if(errocrc==1){// o crc enviado esta certo de acordo com a mensagem enviada
+                memcpy(&data, &rx_buffer[3], 4);
+            }else if(errocrc==-1){// o crc enviado esta errado de acordo com a mensagem enviada
+                if(erro>2){ // se ja ocorreu 2 erros
+                erro =0;
+                }else{ // se ocorreu menos de 2 erros solicita novamente
+                    erro+=1;
+                    uart(solicita); 
+                }
+            }
         }
     }
 

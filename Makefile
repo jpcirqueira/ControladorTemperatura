@@ -1,5 +1,5 @@
-run: main
-	./run
+# run: main
+# 	./run
 main: lcd.o bme.o uart.o gpio.o pid.o
 	gcc main.c ./binarios/*.o -o ./run -lwiringPi
 pid.o: 
