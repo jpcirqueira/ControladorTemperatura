@@ -1,7 +1,9 @@
 # run: main
 # 	./run
-main: lcd.o bme.o uart.o gpio.o pid.o
+main: lcd.o bme.o uart.o gpio.o pid.o arquivo.o
 	gcc main.c ./binarios/*.o -o ./run -lwiringPi
+arquivo.o: 
+	gcc -c ./arquivo/arquivo.c -o ./binarios/arquivo.o
 pid.o: 
 	gcc -c ./pid/pid.c -o ./binarios/pid.o
 lcd.o: 

@@ -4,17 +4,17 @@
 #include <string.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <time.h>
 #include "./bme/bme.h"
 #include "./lcd/lcd.h"
 #include "./uart/uart.h"
 #include "./pid/pid.h"
 #include "./gpio/gpio.h"
+#include "./arquivo/arquivo.h"
 
 #define SOLICITA_TEMP_INTERNA 0xC1
 #define SOLICITA_TEMP_POT 0xC2
 
-int usateterminal=0,escrevearquivo=0,resistor=0,ventoinha=0;
+int usateterminal=0,escrevearquivo=0;
 float teTerminal=0;
 void paragpio(int sinal) {
   gpio_desliga(4); //desliga resistencia
@@ -26,24 +26,6 @@ void paragpio(int sinal) {
 void manda_alarm(int sinal){
   escrevearquivo+=1;
   alarm(1);
-}
-
-void cria_arquivo(){
-  FILE *file = fopen("./grafico/grafico.csv", "w");
-  fprintf(file,"TE,TI,TR,RESISTOR,VENTOINHA,DATA,HORA\n");
-}
-
-void escreve_arquivo(float te, float ti, float tr,int pid){
-    FILE *file = fopen("./grafico/grafico.csv", "a");
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    if(pid<0){
-      ventoinha = pid*-1;
-      fprintf(file,"%f,%f,%f,%d,%d,%d/%d/%d, %02d:%02d:%02d\n", te,ti,tr,0,ventoinha,tm.tm_mday,tm.tm_mon+ 1,tm.tm_year+ 1900,tm.tm_hour, tm.tm_min, tm.tm_sec);
-    }else{
-      fprintf(file,"%f,%f,%f,%d,%d,%d/%d/%d, %02d:%02d:%02d\n", te,ti,tr,pid,0,tm.tm_mday,tm.tm_mon+ 1,tm.tm_year+ 1900,tm.tm_hour, tm.tm_min, tm.tm_sec);
-    }
-    fclose(file);
 }
 
 void menu(){
@@ -73,25 +55,23 @@ void pegaTEterminal(int sinal){
       scanf("%f",&teTerminal);
     }else if(usateterminal == 1){// esta pegando do terminal
       usateterminal=0;
+      printf("temperatura de referencia do potenciometro\n");
     }
-    
   }else{
     exit(0);
   }
 }
 
 int main(){
-  time_t t = time(NULL);
   cria_arquivo();
   pid_configura_constantes(5,1,5);
   menu();
   signal(SIGALRM, manda_alarm);
   signal(SIGTSTP, pegaTEterminal);
-  
+  signal(SIGINT, paragpio);
   while (1)
   {
     alarm(1);
-    signal(SIGINT, paragpio);
     float te = bme();
     float ti = uart(SOLICITA_TEMP_INTERNA);
     float tr;
@@ -120,7 +100,6 @@ int main(){
       gpio_desliga(4); //desliga resistencia
       gpio_desliga(5); //desliga ventoinha
     }
-
     pause();
   }
 return 0;
