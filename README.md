@@ -42,3 +42,4 @@ Grafico com o valor do acionamento dos atuadores (Resistor / Ventoinha) x tempo 
 ## Observações
 
 Os resultados gerados estão sendo gravados em um arquivo .csv disponivel apos a execucao em: ```grafico/dados.csv```
+https://github.com/jpcirqueira/ControladorTemperatura/blob/main/grafico/dados.csv
