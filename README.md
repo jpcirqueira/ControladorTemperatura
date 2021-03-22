@@ -35,7 +35,7 @@ Grafico com as temperaturas (Ambiente, Interna e Referência (Potenciômetro)) x
 
 ### Grafico 2
 
-![](./imagens/imagem1.jpeg)
+![](./imagens/imagem2.jpeg)
 
 Grafico com o valor do acionamento dos atuadores (Resistor / Ventoinha) x tempo de execucão.
 
