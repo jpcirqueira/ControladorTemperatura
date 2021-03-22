@@ -1,5 +1,5 @@
 # Projeto 1
-Repositório do projeto 1 da disciplina Fundamentos de Sistemas Embarcados 2020.2, UnB, campus Gama
+Repositório do projeto 1 da disciplina Fundamentos de Sistemas Embarcados, UNB.
 
 Enunciado do projeto disponivel em: https://gitlab.com/fse_fga/projetos_2020_2/projeto-1-2020.2
 
